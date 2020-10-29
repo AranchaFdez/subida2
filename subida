@@ -9,13 +9,14 @@ $codigosErrorSubida= [
     7 => 'No se pudo guardar el archivo en disco',  // permisos
     8 => 'Una extensión PHP evito la subida del archivo'  // extensión PHP
 ];
-
+//declaramos como una constante la ruta del directorio 
 define ('dir_subida','C:\xampp\htdocs\phpa\subidaFichero\imgusers');
 
 if(isset($_FILES['archivo1']['name'])){
     $arrayFicheros=$_FILES['archivo1'];
     $numArchivos = count($_FILES['archivo1']['name']);
     $mensaje;
+   
     if(comprobarTamanio($numArchivos,$codigosErrorSubida,$mensaje)){
         $mensaje = '<b>Procesando subida de archivos :  </b><br/>';
         for($i=0;$i<$numArchivos;$i++){
@@ -35,6 +36,9 @@ if(isset($_FILES['archivo1']['name'])){
           }
      }
 }
+/*comprobamos el tamaño total de los archivos seleccionamos .si es mayor o igual a 2 y supera los 300kb o
+* si es igual a 1 y supera los 200kb mandamos mensaje de error (false) sino true.
+*/
 function comprobarTamanio($numArchivos,$codigosErrorSubida,&$mensaje){
     $tamanio=array_sum( $_FILES['archivo1']['size']);
     if(($numArchivos>=2 && $tamanio >300000)||($numArchivos==1 && $tamanio>200000)){
@@ -43,6 +47,10 @@ function comprobarTamanio($numArchivos,$codigosErrorSubida,&$mensaje){
     }   
     return true;
 }
+/*almacenamos en un array los sistemas de archivos permitidos
+* con el strstr comprobamos la ultima aparacion ,es equivalente a lastindexOf en java
+*true si esta correcto el sistema de archivo y false si no aparece.
+*/
 function comprobarSistArchivo($nombreFichero){
     $sistemaArchivos=[".jpg",".png"];
     for($i=0;$i<count($sistemaArchivos);$i++){
@@ -52,6 +60,10 @@ function comprobarSistArchivo($nombreFichero){
     }
     return false;
 }
+/*comprobamos si la constate (la ruta) es un directorio y tiene permisos de escritura si es asi, comprobamos si 
+*ya existe el imagen/fichero y movemos el archivo de la carpeta temp
+*
+*/
 function subirArchivo($nombreFichero,$temporalFichero) {
     if ( is_dir(dir_subida) && is_writable (dir_subida)) {
         if(!file_exists(dir_subida .'/'. $nombreFichero) && move_uploaded_file($temporalFichero,  dir_subida .'/'. $nombreFichero)){
@@ -104,7 +116,7 @@ function subirArchivo($nombreFichero,$temporalFichero) {
             </form>
         </div>
        		<div id="cuerpo">
-                <?php   if(!empty($mensaje)){
+                <?php   if(!empty($mensaje)){   
                             echo '<p style="text-align:center;">'.$mensaje."<br>";} ?>
             </div> 
     </div>
